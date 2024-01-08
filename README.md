@@ -1,1 +1,1 @@
-# SeniorProject
+# Senior Seminar Project
