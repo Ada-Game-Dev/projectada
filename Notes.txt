@@ -1,0 +1,5 @@
+Startup:
+node index.js for connection to MongoDB+Express
+npm run dev for starting React+Vite
+
+AnAQg22HjNH9hriC
