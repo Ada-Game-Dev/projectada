@@ -1,9 +1,12 @@
 import { NextFunction, Request, Response } from "express";
-import User from "../db/users.js";
+import User from "../models/User.js";
 import { configureOpenAI } from "../config/openai-config.js";
 import { OpenAIApi, ChatCompletionRequestMessage } from "openai";
-
-export const generateChatCompletion = async (req, res, next) => {
+export const generateChatCompletion = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { message } = req.body;
   try {
     const user = await User.findById(res.locals.jwtData.id);
@@ -36,7 +39,11 @@ export const generateChatCompletion = async (req, res, next) => {
   }
 };
 
-export const sendChatsToUser = async (req, res, next) => {
+export const sendChatsToUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     //user token check
     const user = await User.findById(res.locals.jwtData.id);
@@ -53,7 +60,11 @@ export const sendChatsToUser = async (req, res, next) => {
   }
 };
 
-export const deleteChats = async (req, res, next) => {
+export const deleteChats = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     //user token check
     const user = await User.findById(res.locals.jwtData.id);

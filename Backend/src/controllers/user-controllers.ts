@@ -1,31 +1,39 @@
-// CRUD operations for users
-import {NextFunction, Request, Response} from "express";
-import User from "../db/users.js";
-import {hash, compare} from "bcrypt";
-import {createToken} from "../Utils/token-manager.js";
-import {COOKIE_NAME} from "../Utils/constants.js";
+import { NextFunction, Request, Response } from "express";
+import User from "../models/User.js";
+import { hash, compare } from "bcrypt";
+import { createToken } from "../utils/token-manager.js";
+import { COOKIE_NAME } from "../utils/constants.js";
 
-export const getAllUsers = async (req, res, next) => {
+export const getAllUsers = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     //get all users
     const users = await User.find();
-    return res.status(200).json({message: "OK", users});
-  } catch (error){
+    return res.status(200).json({ message: "OK", users });
+  } catch (error) {
     console.log(error);
-    return res.status(200).json({message: "ERROR", cause: error.message});
+    return res.status(200).json({ message: "ERROR", cause: error.message });
   }
 };
 
-export const userSignup = async (req, res, next) => {
+export const userSignup = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     //user signup
-    const {name, email, password} = req.body;
-    const existingUser = await User.findOne({email});
+    const { name, email, password } = req.body;
+    const existingUser = await User.findOne({ email });
     if (existingUser) return res.status(401).send("User already registered");
     const hashedPassword = await hash(password, 10);
-    const user = new User({name, email, password: hashedPassword});
+    const user = new User({ name, email, password: hashedPassword });
+    await user.save();
 
-    //create token and store cookie
+    // create token and store cookie
     res.clearCookie(COOKIE_NAME, {
       httpOnly: true,
       domain: "localhost",
@@ -44,14 +52,20 @@ export const userSignup = async (req, res, next) => {
       signed: true,
     });
 
-    return res.status(201).json({message:"OK", name: user.username, emailo: user.email});
-  } catch (error){
+    return res
+      .status(201)
+      .json({ message: "OK", name: user.name, email: user.email });
+  } catch (error) {
     console.log(error);
-    return res.status(200).json({message: "ERROR", cause: error.message});
+    return res.status(200).json({ message: "ERROR", cause: error.message });
   }
 };
 
-export const userLogin = async (req, res, next) => {
+export const userLogin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     //user login
     const { email, password } = req.body;
@@ -86,14 +100,18 @@ export const userLogin = async (req, res, next) => {
 
     return res
       .status(200)
-      .json({ message: "OK", name: user.username, email: user.email });
+      .json({ message: "OK", name: user.name, email: user.email });
   } catch (error) {
     console.log(error);
     return res.status(200).json({ message: "ERROR", cause: error.message });
   }
 };
 
-export const verifyUser = async (req, res, next) => {
+export const verifyUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     //user token check
     const user = await User.findById(res.locals.jwtData.id);
@@ -105,14 +123,18 @@ export const verifyUser = async (req, res, next) => {
     }
     return res
       .status(200)
-      .json({ message: "OK", name: user.username, email: user.email });
+      .json({ message: "OK", name: user.name, email: user.email });
   } catch (error) {
     console.log(error);
     return res.status(200).json({ message: "ERROR", cause: error.message });
   }
 };
 
-export const userLogout = async ( req, res, next) => {
+export const userLogout = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     //user token check
     const user = await User.findById(res.locals.jwtData.id);
@@ -132,13 +154,9 @@ export const userLogout = async ( req, res, next) => {
 
     return res
       .status(200)
-      .json({ message: "OK", name: user.username, email: user.email });
+      .json({ message: "OK", name: user.name, email: user.email });
   } catch (error) {
     console.log(error);
     return res.status(200).json({ message: "ERROR", cause: error.message });
   }
-};
-
-export const deleteUser = async (req, res) => {
-  return;
 };

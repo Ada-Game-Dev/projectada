@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { verifyToken } from "../Utils/token-manager.js";
-import { chatCompletionValidator, validate } from "../Utils/validators.js";
+import { verifyToken } from "../utils/token-manager.js";
+import { chatCompletionValidator, validate } from "../utils/validators.js";
 import {
   deleteChats,
   generateChatCompletion,
   sendChatsToUser,
-} from "../controllers/chat-controller.js";
+} from "../controllers/chat-controllers.js";
 
 //Protected API
 const chatRoutes = Router();
