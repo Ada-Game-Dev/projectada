@@ -10,8 +10,8 @@ import {
   loginValidator,
   signupValidator,
   validate,
-} from "../utils/validators.js";
-import { verifyToken } from "../utils/token-manager.js";
+} from "../Utils/validators.js";
+import { verifyToken } from "../Utils/token-manager.js";
 
 const userRoutes = Router();
 

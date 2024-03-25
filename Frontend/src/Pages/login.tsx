@@ -28,68 +28,97 @@ const Login = () => {
     }
   }, [auth]);
   return (
-    <Box width={"100%"} height={"100%"} display="flex" flex={1}>
-      <Box padding={8} mt={8} display={{ md: "flex", sm: "none", xs: "none" }}>
-        <img src="airobot.png" alt="Robot" style={{ width: "400px" }} />
-      </Box>
-      <Box
-        display={"flex"}
-        flex={{ xs: 1, md: 0.5 }}
-        justifyContent={"center"}
-        alignItems={"center"}
-        padding={2}
-        ml={"auto"}
-        mt={16}
+    <Box width={"100vw"} height={"100vh"} display="flex">
+  {/* Left Side with Illustration and Text */}
+  <Box bgcolor={'#DB1313'} flex={1} display="flex" flexDirection="column" justifyContent="center" alignItems="center">
+    <Box 
+      component="img"
+      src="..\AdaIllustration.svg"
+      alt="Ada"
+      sx={{
+        width: { xs: '80%', sm: '60%', md: '300px' },
+        maxWidth: '400px'
+      }}
+    />
+    <Typography
+      variant="h3"
+      textAlign="center"
+      color="white"
+      mt={4}
+      sx={{
+        fontWeight: 500,
+        width: '60%',
+      }}
+    >
+      Ada Chatbot: Unleash your creativity!
+    </Typography>
+    <Typography
+      variant="subtitle1"
+      textAlign="center"
+      color="white"
+      my={4}
+      sx={{
+        fontWeight: 300
+      }}
+    >
+      Bring your Projects to life
+    </Typography>
+  </Box>
+  
+  {/* Right Side with Login Form */}
+  <Box bgcolor={'#222222'} flex={1} display="flex" flexDirection="column" justifyContent="center" alignItems="center">
+    <Box
+      bgcolor="transparent"
+      p={5}
+      sx={{
+        width: { xs: '80%', sm: '70%', md: '50%' },
+        maxWidth: '500px',
+        boxSizing: 'border-box'
+      }}
+    >
+      <Typography
+        variant="h4"
+        textAlign="center"
+        color="white"
+        gutterBottom
       >
-        <form
-          onSubmit={handleSubmit}
-          style={{
-            margin: "auto",
-            padding: "30px",
-            boxShadow: "10px 10px 20px #000",
-            borderRadius: "10px",
-            border: "none",
+        Log In
+      </Typography>
+      <form onSubmit={handleSubmit}>
+        <CustomizedInput type="email" name="email" label="Email" />
+        <CustomizedInput type="password" name="password" label="Password" />
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          endIcon={<IoIosLogIn />}
+          sx={{
+            mt: 2,
+            bgcolor: "#DB1313",
+            '&:hover': {
+              bgcolor: "#A31010",
+              
+            },
           }}
         >
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-            }}
-          >
-            <Typography
-              variant="h4"
-              textAlign="center"
-              padding={2}
-              fontWeight={600}
-            >
-              Login
-            </Typography>
-            <CustomizedInput type="email" name="email" label="Email" />
-            <CustomizedInput type="password" name="password" label="Password" />
-            <Button
-              type="submit"
-              sx={{
-                px: 2,
-                py: 1,
-                mt: 2,
-                width: "400px",
-                borderRadius: 2,
-                bgcolor: "#00fffc",
-                ":hover": {
-                  bgcolor: "white",
-                  color: "black",
-                },
-              }}
-              endIcon={<IoIosLogIn />}
-            >
-              Login
-            </Button>
+          Login
+        </Button>
+        <Typography
+          variant="body2"
+          textAlign="center"
+          color="white"
+          mt={2}
+        >
+          Don't have an account?{' '}
+          <Box component="span" sx={{ textDecoration: 'underline', cursor: 'pointer' }} onClick={() => navigate('/signup')}>
+            Sign Up instead.
           </Box>
-        </form>
-      </Box>
+        </Typography>
+      </form>
     </Box>
+  </Box>
+</Box>
+
   );
 };
 

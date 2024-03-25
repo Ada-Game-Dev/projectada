@@ -1,7 +1,5 @@
 import { Box, useMediaQuery, useTheme } from "@mui/material";
-import React from "react";
 import TypingAnim from "../Components/Typer/typinganim";
-import Footer from "../Components/Footer/footer";
 
 const Home = () => {
   const theme = useTheme();
@@ -18,6 +16,22 @@ const Home = () => {
           mt: 3,
         }}
       >
+        <Box sx={{ display: "flex", mx: "auto" }}>
+          <img
+            src="../../AdaLogo3.webp"
+            alt="chatbot"
+            style={{
+              display: "flex",
+              margin: "auto",
+              width: isBelowMd ? "80%" : "35%",
+              borderRadius: 20,
+              boxShadow: "-5px -5px 70px #DB1313",
+              marginTop: 140,
+              marginBottom: 90,
+            
+            }}
+          />
+        </Box>
         <Box>
           <TypingAnim />
         </Box>
@@ -30,36 +44,11 @@ const Home = () => {
             my: 10,
           }}
         >
-          <img
-            src="robot.png"
-            alt="robot"
-            style={{ width: "200px", margin: "auto" }}
-          />
-          <img
-            className="image-inverted rotate"
-            src="openai.png"
-            alt="openai"
-            style={{ width: "200px", margin: "auto" }}
-          />
+         
+         
         </Box>
-        <Box sx={{ display: "flex", mx: "auto" }}>
-          <img
-            src="chat.png"
-            alt="chatbot"
-            style={{
-              display: "flex",
-              margin: "auto",
-              width: isBelowMd ? "80%" : "60%",
-              borderRadius: 20,
-              boxShadow: "-5px -5px 105px #64f3d5",
-              marginTop: 20,
-              marginBottom: 20,
-              padding: 10,
-            }}
-          />
-        </Box>
+        
       </Box>
-      <Footer />
     </Box>
   );
 };

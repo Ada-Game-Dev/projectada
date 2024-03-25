@@ -1,4 +1,3 @@
-import React from "react";
 import { Box, Avatar, Typography } from "@mui/material";
 import { useAuth } from "../../Context/authcontext";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";

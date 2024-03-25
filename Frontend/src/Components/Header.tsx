@@ -1,4 +1,3 @@
-import React from "react";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Logo from "./Shared/logo";
@@ -33,16 +32,17 @@ const Header = () => {
           ) : (
             <>
               <NavigationLink
-                bg="#00fffc"
+                bg="#DB1313"
                 to="/login"
                 text="Login"
-                textColor="black"
+                textColor="white"
               />
               <NavigationLink
-                bg="#51538f"
+                bg="#000000"
                 textColor="white"
                 to="/signup"
-                text="Signup"
+                text="Signup" 
+               
               />
             </>
           )}
