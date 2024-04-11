@@ -4,7 +4,7 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background: #05101c;
+  background: #000000;
   color: white;
   font-family: "Roboto Slab", serif;
 }
@@ -24,7 +24,8 @@ body {
 }
 .MuiOutlinedInput-input-root.Mui-focused,
 .MuiOutlinedInput-notchedOutline {
-  border-color: white !important;
+  border-color: #D63C3C !important; 
+  width: 100%;
 }
 
 .rotate {
