@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { verifyToken } from "../utils/token-manager.js";
-import { chatCompletionValidator, validate } from "../utils/validators.js";
+import { chatCompletionValidator, validate } from "../Utils/validators.js";
 import {
   deleteChats,
   generateChatCompletion,
