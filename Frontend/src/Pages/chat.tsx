@@ -84,9 +84,9 @@ const Chat = () => {
           sx={{
             display: "flex",
             width: "100%",
-            height: "60vh",
-            bgcolor: "rgb(17,29,39)",
-            borderRadius: 5,
+            height: "100%",
+            bgcolor: "rgb(31, 31, 31)",
+            borderRadius: 2,
             flexDirection: "column",
             mx: 3,
           }}
@@ -100,11 +100,11 @@ const Chat = () => {
               fontWeight: 700,
             }}
           >
-            {auth?.user?.name[0]}
-            {auth?.user?.name.split(" ")[1][0]}
+            {/* {auth?.user?.name[0]}
+            {auth?.user?.name.split(" ")[1][0]} */}
           </Avatar>
           <Typography sx={{ mx: "auto", fontFamily: "work sans" }}>
-            You are talking to a ChatBOT
+            You are talking to a ADAChatBOT
           </Typography>
           <Typography sx={{ mx: "auto", fontFamily: "work sans", my: 4, p: 3 }}>
             You can ask some questions related to Knowledge, Business, Advices,
@@ -114,15 +114,13 @@ const Chat = () => {
             onClick={handleDeleteChats}
             sx={{
               width: "200px",
-              my: "auto",
               color: "white",
               fontWeight: "700",
-              borderRadius: 3,
+              borderRadius: 2,
               mx: "auto",
-              bgcolor: red[300],
-              ":hover": {
-                bgcolor: red.A400,
-              },
+              marginTop: 'auto', 
+              marginBottom:5,
+              bgcolor: "rgb(219,19,19)"
             }}
           >
             Clear Conversation
@@ -143,16 +141,17 @@ const Chat = () => {
             color: "white",
             mb: 2,
             mx: "auto",
+            my: "auto",
             fontWeight: "600",
           }}
         >
-          Model - GPT 3.5 Turbo
+          Model - Ada 1.0
         </Typography>
         <Box
           sx={{
             width: "100%",
-            height: "60vh",
-            borderRadius: 3,
+            height: "65vh",
+            borderRadius: 2,
             mx: "auto",
             display: "flex",
             flexDirection: "column",
@@ -169,9 +168,9 @@ const Chat = () => {
         </Box>
         <div
           style={{
-            width: "100%",
-            borderRadius: 8,
-            backgroundColor: "rgb(17,27,39)",
+            width: "85%",
+            borderRadius: 2,
+            backgroundColor: "rgb(31, 31, 31)",
             display: "flex",
             margin: "auto",
           }}
@@ -180,17 +179,23 @@ const Chat = () => {
           <input
             ref={inputRef}
             type="text"
+            placeholder="Send a message..."
             style={{
               width: "100%",
               backgroundColor: "transparent",
-              padding: "30px",
-              border: "none",
-              outline: "none",
+              padding: "20px",
+              border: "2px",
+              outline: "none", 
+              borderRadius:2,
+              borderStyle:"solid",
+              borderColor:"rgb(214,60,60)",
               color: "white",
               fontSize: "20px",
             }}
           />
-          <IconButton onClick={handleSubmit} sx={{ color: "white", mx: 1 }}>
+          <IconButton onClick={handleSubmit} sx={{ color: "white", backgroundColor:"rgb(214,60,60)", 
+              borderRadius:"2%",
+              borderStyle:"solid" }}>
             <IoMdSend />
           </IconButton>
         </div>

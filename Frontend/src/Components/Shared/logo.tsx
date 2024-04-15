@@ -1,4 +1,5 @@
 import Typography from "@mui/material/Typography";
+import NavigationLink from "./navigationlink";
 const Logo = () => {
   return (
     <div
@@ -18,7 +19,12 @@ const Logo = () => {
           textShadow: "2px 2px 20px #000",
         }}
       >
-        <span style={{ fontSize: "30px" }}>Ada</span>CHATBOT
+        <NavigationLink
+                bg="#000000"
+                to="/"
+                text="AdaCHATBOT"
+                textColor="white"
+              />
       </Typography>
     </div>
   );

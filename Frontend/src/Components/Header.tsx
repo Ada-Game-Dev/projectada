@@ -15,14 +15,9 @@ const Header = () => {
         <div>
           {auth?.isLoggedIn ? (
             <>
+           
               <NavigationLink
-                bg="#00fffc"
-                to="/chat"
-                text="Go To Chat"
-                textColor="black"
-              />
-              <NavigationLink
-                bg="#51538f"
+                bg="#DB1313"
                 textColor="white"
                 to="/"
                 text="logout"
