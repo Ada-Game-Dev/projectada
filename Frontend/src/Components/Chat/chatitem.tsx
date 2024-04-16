@@ -47,7 +47,7 @@ const ChatItem = ({
       }}
     >
       <Avatar sx={{ ml: "0" }}>
-        <img src="openai.png" alt="openai" width={"30px"} />
+        <img src="AdaLogo.png" alt="ada" width={"30px"} />
       </Avatar>
       <Box>
         {!messageBlocks && (
