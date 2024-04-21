@@ -6,6 +6,7 @@ import ChatItem from "../Components/Chat/chatitem";
 import { IoMdSend } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import {
+  createUserChats,
   deleteUserChats,
   getUserChats,
   sendChatRequest,
@@ -28,9 +29,29 @@ const Chat = () => {
     }
     const newMessage: Message = { role: "user", content };
     setChatMessages((prev) => [...prev, newMessage]);
-    const chatData = await sendChatRequest(content);
-    setChatMessages([...chatData.chats]);
+    try {
+      toast.loading("Generating Response", { id: "generatingres" });
+      const chatData = await sendChatRequest(content);
+      setChatMessages([...chatData.chats]);
+      toast.success("Response Generated", { id: "generatingres" });
+    } catch (error) {
+      console.log(error);
+      toast.error("Generating Response failed", { id: "generatingres" });
+    }
+    
+    //setChatMessages([...chatData.chats]);
     //
+  };
+  const handleCreateChat = async () => {
+    try {
+      toast.loading("Creating Chat", { id: "createchats" });
+      await createUserChats();
+      setChatMessages([]);
+      toast.success("Created Chat Successfully", { id: "createchats" });
+    } catch (error) {
+      console.log(error);
+      toast.error("Creating chats failed", { id: "createchats" });
+    }
   };
   const handleDeleteChats = async () => {
     try {
@@ -104,11 +125,23 @@ const Chat = () => {
           {auth?.user?.name.includes(" ") && auth?.user?.name.split(" ")[1][0]}
           </Avatar>
           <Typography sx={{ mx: "auto", fontFamily: "work sans" }}>
-            You are talking to a ADAChatBOT
+            Welcome to ADA
           </Typography>
-          <Typography sx={{ mx: "auto", fontFamily: "work sans", my: 4, p: 3 }}>
-            You can ask some questions related to Game Development, But avoid sharing personal information
-          </Typography>
+          <Button
+            onClick={handleCreateChat}
+            sx={{
+              width: "200px",
+              color: "white",
+              fontWeight: "700",
+              borderRadius: 2,
+              mx: "auto",
+              marginTop: 5, 
+              marginBottom:5,
+              bgcolor: "rgb(219,19,19)"
+            }}
+          >
+            New Chat
+          </Button>
           <Button
             onClick={handleDeleteChats}
             sx={{
@@ -149,7 +182,7 @@ const Chat = () => {
         <Box
           sx={{
             width: "100%",
-            height: "65vh",
+            height: "80vh",
             borderRadius: 2,
             mx: "auto",
             display: "flex",
