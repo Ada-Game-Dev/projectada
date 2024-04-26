@@ -30,7 +30,6 @@ const ChatItem = ({
   content,
   role,
 }: {
-  id: string;
   content: string;
   role: "user" | "assistant";
 }) => {

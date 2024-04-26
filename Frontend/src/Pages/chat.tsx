@@ -1,6 +1,5 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Box, Avatar, Typography, Button, IconButton } from "@mui/material";
-import red from "@mui/material/colors/red";
 import { useAuth } from "../Context/authcontext";
 import ChatItem from "../Components/Chat/chatitem";
 import { IoMdSend } from "react-icons/io";
@@ -41,6 +40,17 @@ const Chat = () => {
     
     //setChatMessages([...chatData.chats]);
     //
+  };
+  const handleSwitchChat = async () => {
+    try {
+      toast.loading("Switching Chat", { id: "switchchats" });
+      await createUserChats();
+      setChatMessages([]);
+      toast.success("Switching Chat Successfully", { id: "switchchats" });
+    } catch (error) {
+      console.log(error);
+      toast.error("Switching chats failed", { id: "switchchats" });
+    }
   };
   const handleCreateChat = async () => {
     try {
@@ -141,6 +151,21 @@ const Chat = () => {
             }}
           >
             New Chat
+          </Button>
+          <Button
+            onClick={handleSwitchChat}
+            sx={{
+              width: "100%",
+              color: "white",
+              fontWeight: "700",
+              borderRadius: 2,
+              mx: "auto",
+              marginTop: 5, 
+              marginBottom:5,
+              bgcolor: "rgb(51, 51, 51)"
+            }}
+          >
+            {auth?.user?.name.concat(", ADA")}
           </Button>
           <Button
             onClick={handleDeleteChats}
