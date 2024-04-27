@@ -5,7 +5,7 @@ import ChatItem from "../Components/Chat/chatitem";
 import { IoMdSend } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import {
-  createUserChats,
+  createUserConv,
   deleteUserChats,
   getUserChats,
   sendChatRequest,
@@ -30,7 +30,7 @@ const Chat = () => {
     setChatMessages((prev) => [...prev, newMessage]);
     try {
       toast.loading("Generating Response", { id: "generatingres" });
-      const chatData = await sendChatRequest(content);
+      const chatData = await sendChatRequest(newMessage.content);
       setChatMessages([...chatData.chats]);
       toast.success("Response Generated", { id: "generatingres" });
     } catch (error) {
@@ -52,10 +52,10 @@ const Chat = () => {
       toast.error("Switching chats failed", { id: "switchchats" });
     }
   };
-  const handleCreateChat = async () => {
+  const handleCreateConv = async () => {
     try {
       toast.loading("Creating Chat", { id: "createchats" });
-      await createUserChats();
+      await createUserConv();
       setChatMessages([]);
       toast.success("Created Chat Successfully", { id: "createchats" });
     } catch (error) {
@@ -138,7 +138,7 @@ const Chat = () => {
             Welcome to ADA
           </Typography>
           <Button
-            onClick={handleCreateChat}
+            onClick={handleCreateConv}
             sx={{
               width: "200px",
               color: "white",

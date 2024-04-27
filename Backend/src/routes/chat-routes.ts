@@ -5,6 +5,7 @@ import {
   deleteChats,
   generateChatCompletion,
   sendChatsToUser,
+  createConversation,
 } from "../controllers/chat-controllers.js";
 
 //Protected API
@@ -17,5 +18,7 @@ chatRoutes.post(
 );
 chatRoutes.get("/all-chats", verifyToken, sendChatsToUser);
 chatRoutes.delete("/delete", verifyToken, deleteChats);
+// chat route to start a new conversation
+chatRoutes.post("/new-conversation", verifyToken, createConversation);
 
 export default chatRoutes;

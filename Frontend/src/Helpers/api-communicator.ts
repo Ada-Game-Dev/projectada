@@ -48,8 +48,8 @@ export const getUserChats = async () => {
   return data;
 };
 
-export const createUserChats = async () => {
-  const res = await axios.post("/chat/new");
+export const createUserConv = async () => {
+  const res = await axios.post("/chat/new-conversation ");
   if (res.status !== 200) {
     throw new Error("Unable to create chats");
   }

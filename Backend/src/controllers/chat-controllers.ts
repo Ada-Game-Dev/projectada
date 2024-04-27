@@ -17,8 +17,7 @@ export const generateChatCompletion = async (
         .status(401)
         .json({ message: "User not registered OR Token malfunctioned" });
     // grab chats of user
-    const chats = user.chats.map(({ id, role, content }) => ({
-      id,
+    const chats = user.chats.map(({role, content }) => ({
       role,
       content,
     })) as ChatCompletionRequestMessage[];
@@ -33,13 +32,13 @@ export const generateChatCompletion = async (
       model: "gpt-3.5-turbo",
       messages: chats,
     });
-    user.chats.push({id: chatResponse.data.id, content: chatResponse.data.choices[0].message.content, role: "openai"});
-    console.log(user.chats.at(-1).id);
+    user.chats.push({id: chatResponse.data.id, content: chatResponse.data.choices[0].message.content, role: "assistant"});
+    console.log("Chat ID: ", user.chats.at(-1).id);
     await user.save();
     return res.status(200).json({ chats: user.chats });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: "Something went wrong" });
+    return res.status(500).json({ message: "generateChatCompletion error", cause: error.response.data });
   }
 };
 
