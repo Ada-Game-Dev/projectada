@@ -41,7 +41,7 @@ const Chat = () => {
       console.log("Message: ", newMessage.content);
       const chatData = await sendChatRequest(activeConversation+1 ?? 0, newMessage.content);
       console.log("Chat Data: ", chatData);
-      setChatMessages([...chatData.conversation.chats]);
+      //setChatMessages([...chatData.conversation.chats]);
       if (activeConversation !== null) {
         const updatedConversations = [...conversations];
         console.log("Updated Conversations: ", updatedConversations);
