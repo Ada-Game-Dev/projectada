@@ -3,3 +3,6 @@ node index.js for connection to MongoDB+Express
 npm run dev for starting React+Vite
 
 AnAQg22HjNH9hriC
+
+Figure out why chatMessages are not being set with the new message.
+Figure out why chatData does not contain the sent message and response in the chats. 

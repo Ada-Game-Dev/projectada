@@ -35,21 +35,23 @@ const Chat = () => {
       inputRef.current.value = "";
     }
     const newMessage: Message = { role: "user", content };
-    setChatMessages((prev) => [...prev, newMessage]);
+    setChatMessages((prev) => [...prev, newMessage]); // Update the chatMessages state with the new message
+    console.log("Chat Messages: ", chatMessages);
+// NEW CODE
     try {
       toast.loading("Generating Response", { id: "generatingres" });
       console.log("Message: ", newMessage.content);
-      const chatData = await sendChatRequest(activeConversation+1 ?? 0, newMessage.content);
+      const chatData = await sendChatRequest(activeConversation+1 ?? 0, content);
       console.log("Chat Data: ", chatData);
-      //setChatMessages([...chatData.conversation.chats]);
+      console.log("Chat Data Response: ", chatData.conversation.chats);
+      setChatMessages([...chatData.conversation.chats]);
       if (activeConversation !== null) {
-        const updatedConversations = [...conversations];
+        const updatedConversations = [...conversations];  // Copy the conversations array
         console.log("Updated Conversations: ", updatedConversations);
         console.log("New Message: ", newMessage);
-        updatedConversations[activeConversation].chats?.push(newMessage);
-        setConversations(updatedConversations);
-        updatedConversations[activeConversation].chats?.push(chatData);
-        setConversations(updatedConversations);
+        updatedConversations[activeConversation].chats?.push(newMessage, chatData.conversation.chats[-1]); // Push the new message and response to the active conversation
+        setConversations(updatedConversations); // Update the conversations state
+        console.log("Updated Conversation: ", updatedConversations[activeConversation]);
       }
       // Update chatMessages state with the new chat data
       //setChatMessages((prev) => [...prev, ...chatData.conversation.chats]);
@@ -59,6 +61,18 @@ const Chat = () => {
       console.log(error);
       toast.error("Generating Response failed", { id: "generatingres" });
     }
+    // OLD CODE
+    /*
+    try {
+      toast.loading("Generating Response", { id: "generatingres" });
+      const chatData = await sendChatRequest(content);
+      setChatMessages([...chatData.chats]);
+      toast.success("Response Generated", { id: "generatingres" });
+    } catch (error) {
+      console.log(error);
+      toast.error("Generating Response failed", { id: "generatingres" });
+    }
+    */
     //setChatMessages([...chatData.chats]);
     //
   };

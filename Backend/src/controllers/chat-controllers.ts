@@ -9,8 +9,9 @@ export const generateChatCompletion = async (
   res: Response,
   next: NextFunction
 ) => {
+  console.log("generateChatCompletion");
   const { activeConversationId, message } = req.body;
-  console.log("Conversation ID: ", activeConversationId, "Message: ", message)
+  console.log("Conversation ID: ", activeConversationId, "New Message: ", message)
   try {
     const user = await IUser.findById(res.locals.jwtData.id);
     if (!user){
@@ -45,11 +46,18 @@ export const generateChatCompletion = async (
       role,
       content,
     })) as ChatCompletionRequestMessage[];
+
+    console.log("Messages1: ", messages);
     // update the first message in messages to have content
-    messages[0].content = "You are a helpful video game development assistant named Ada.";
-    if (message && message.content) {
-      messages.push({ content: message.content, role: "user" });
+    if(!messages[0].content){
+      messages[0].content = "You are a helpful video game development assistant named Ada.";
     }
+    console.log("Messages2: ", messages);
+
+    if (message) {
+      messages.push({ content: message, role: "user" });
+    }
+    console.log("Messages3: ", messages);
     // get latest response
     const chatResponse = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
