@@ -1,6 +1,5 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Box, Avatar, Typography, Button, IconButton } from "@mui/material";
-import red from "@mui/material/colors/red";
 import { useAuth } from "../Context/authcontext";
 import ChatItem from "../Components/Chat/chatitem";
 import { IoMdSend } from "react-icons/io";
@@ -127,21 +126,6 @@ const Chat = () => {
           <Typography sx={{ mx: "auto", fontFamily: "work sans" }}>
             Welcome to ADA
           </Typography>
-          <Button
-            onClick={handleCreateChat}
-            sx={{
-              width: "200px",
-              color: "white",
-              fontWeight: "700",
-              borderRadius: 2,
-              mx: "auto",
-              marginTop: 5, 
-              marginBottom:5,
-              bgcolor: "rgb(219,19,19)"
-            }}
-          >
-            New Chat
-          </Button>
           <Button
             onClick={handleDeleteChats}
             sx={{
