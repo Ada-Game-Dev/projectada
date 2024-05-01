@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import User from "../models/User.js";
+import IUser from "../models/User.js";
 import { configureOpenAI } from "../config/openai-config.js";
 import { OpenAIApi, ChatCompletionRequestMessage } from "openai";
 
@@ -9,33 +9,67 @@ export const generateChatCompletion = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { message } = req.body;
+  const { activeConversationId, message } = req.body;
+  console.log("Conversation ID: ", activeConversationId, "Message: ", message)
   try {
-    const user = await User.findById(res.locals.jwtData.id);
-    if (!user)
+    const user = await IUser.findById(res.locals.jwtData.id);
+    if (!user){
       return res
         .status(401)
         .json({ message: "User not registered OR Token malfunctioned" });
-    // grab chats of user
-    const chats = user.chats.map(({role, content }) => ({
-      role,
-      content,
-    })) as ChatCompletionRequestMessage[];
-    chats.push({ content: message, role: "user" });
-    user.chats.push({ id:message.id, content: message, role: "user" });
+    }
+    // Find the current conversation based on some criteria (for example, activeConversationId)
+    // Check the user is part of the conversation
+    const currentConversation = user.conversations.find(
+      conversation => conversation.get("id") === activeConversationId
+    );
+
+    if (!currentConversation)
+      return res.status(404).json({ message: "Conversation not found" });
+
+    // Add the message to the current conversation
+    if (message) {
+      await user.collection.updateOne(
+        { "conversations.id": activeConversationId },
+        { $push: { "conversations.$.chats": { content: message, role: "user" } } }
+      );
+    }
+    console.log("BEFORE CONFIG")
 
     // send all chats with new one to openAI API
     const config = configureOpenAI();
     const openai = new OpenAIApi(config);
+
+    // Get chats of currentConversation
+    const messages = (currentConversation as any).chats.map(({ role, content }) => ({
+      role,
+      content,
+    })) as ChatCompletionRequestMessage[];
+    // update the first message in messages to have content
+    messages[0].content = "You are a helpful video game development assistant named Ada.";
+    if (message && message.content) {
+      messages.push({ content: message.content, role: "user" });
+    }
     // get latest response
     const chatResponse = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
-      messages: chats,
+      messages: messages,
     });
-    user.chats.push({id: chatResponse.data.id, content: chatResponse.data.choices[0].message.content, role: "assistant"});
-    console.log("Chat ID: ", user.chats.at(-1).id);
+    console.log("Chat Response: ", chatResponse.data.choices[0].message.content);
+    // Add assistant response to the current conversation
+    user.collection.updateOne(
+      { "conversations.id": activeConversationId },
+      {
+        $push: {
+          "conversations.$.chats": {
+            content: chatResponse.data.choices[0].message.content,
+            role: "assistant",
+          },
+        },
+      }
+    );
     await user.save();
-    return res.status(200).json({ chats: user.chats });
+    return res.status(200).json({ conversation: currentConversation });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "generateChatCompletion error", cause: error.response.data });
@@ -48,16 +82,21 @@ export const sendChatsToUser = async (
   res: Response,
   next: NextFunction
 ) => {
+  const { activeConversationId } = req.body;
   try {
     //user token check
-    const user = await User.findById(res.locals.jwtData.id);
+    const user = await IUser.findById(res.locals.jwtData.id);
     if (!user) {
       return res.status(401).send("User not registered OR Token malfunctioned");
     }
     if (user._id.toString() !== res.locals.jwtData.id) {
       return res.status(401).send("Permissions didn't match");
     }
-    return res.status(200).json({ message: "OK", chats: user.chats });
+    // Find the current conversation based on some criteria (for example, activeConversationId)
+    const currentConversation = user.conversations.find(
+      conversation => conversation.get("id") === activeConversationId
+    );
+    return res.status(200).json({ message: "OK", chats: (currentConversation as any).chats });
   } catch (error) {
     console.log(error);
     return res.status(200).json({ message: "ERROR", cause: error.message });
@@ -70,21 +109,30 @@ export const deleteChats = async (
   res: Response,
   next: NextFunction
 ) => {
+  // grab conversation id
+  const { activeConversationId } = req.body;
+  console.log("Conversation ID: ", activeConversationId);
   try {
     //user token check
-    const user = await User.findById(res.locals.jwtData.id);
+    const user = await IUser.findById(res.locals.jwtData.id);
     if (!user) {
       return res.status(401).send("User not registered OR Token malfunctioned");
     }
     if (user._id.toString() !== res.locals.jwtData.id) {
       return res.status(401).send("Permissions didn't match");
     }
-    //@ts-ignore
-    user.chats = [];
+    await user.collection.findOneAndUpdate(
+      { "conversations.id": activeConversationId }, 
+      {
+        $set: { "conversations.chats": [] }
+      }
+    );
+    //user.chats = [];
     await user.save();
     return res.status(200).json({ message: "OK" });
   } catch (error) {
     console.log(error);
+    console.log(error.message);
     return res.status(200).json({ message: "ERROR", cause: error.message });
   }
 };
@@ -97,23 +145,48 @@ export const createConversation = async (
 ) => {
   try {
     //user token check
-    const user = await User.findById(res.locals.jwtData.id);
+    const user = await IUser.findById(res.locals.jwtData.id);
     if (!user) {
       return res.status(401).send("User not registered OR Token malfunctioned");
     }
     if (user._id.toString() !== res.locals.jwtData.id) {
       return res.status(401).send("Permissions didn't match");
     }
-    // grab participants
-    const { participants } = req.body;
+    // grab participants and id
+    const { id, participants } = req.body;
+    // get participant IDs
+    const participantIDs = await IUser.find({ name: { $in: participants } }).distinct('_id');
     // create conversation
-    const conversation = {
-      participants,
+    const newConversation = {
+      id,
+      participants: [participantIDs],
       chats: [],
     };
-    user.conversations.push(conversation);
+    user.conversations.push(newConversation);
     await user.save();
     return res.status(200).json({ message: "OK" });
+  } catch (error) {
+    console.log(error);
+    return res.status(200).json({ message: "ERROR", cause: error.message });
+  }
+};
+
+// function to send conversations to user
+export const sendConversationsToUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    //user token check
+    const user = await IUser.findById(res.locals.jwtData.id);
+    if (!user) {
+      return res.status(401).send("User not registered OR Token malfunctioned");
+    }
+    if (user._id.toString() !== res.locals.jwtData.id) {
+      return res.status(401).send("Permissions didn't match");
+    }
+    return res.status(200).json({ message: "OK", conversations: user.conversations });
   } catch (error) {
     console.log(error);
     return res.status(200).json({ message: "ERROR", cause: error.message });

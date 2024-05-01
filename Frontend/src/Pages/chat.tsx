@@ -8,6 +8,7 @@ import {
   createUserConv,
   deleteUserChats,
   getUserChats,
+  getUserConversations,
   sendChatRequest,
 } from "../Helpers/api-communicator";
 import toast from "react-hot-toast";
@@ -16,11 +17,18 @@ type Message = {
   role: "user" | "assistant";
   content: string;
 };
+type Conversation = {
+  id: number;
+  title: string;
+  chats: Message[];
+}
 const Chat = () => {
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const auth = useAuth();
-  const [chatMessages, setChatMessages] = useState<Message[]>([]);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [activeConversation, setActiveConversation] = useState<Conversation["id"]>(0);
+  const [chatMessages, setChatMessages] = useState<Conversation["chats"]>([]);
   const handleSubmit = async () => {
     const content = inputRef.current?.value as string;
     if (inputRef && inputRef.current) {
@@ -30,43 +38,74 @@ const Chat = () => {
     setChatMessages((prev) => [...prev, newMessage]);
     try {
       toast.loading("Generating Response", { id: "generatingres" });
-      const chatData = await sendChatRequest(newMessage.content);
-      setChatMessages([...chatData.chats]);
+      console.log("Message: ", newMessage.content);
+      const chatData = await sendChatRequest(activeConversation+1 ?? 0, newMessage.content);
+      console.log("Chat Data: ", chatData);
+      setChatMessages([...chatData.conversation.chats]);
+      if (activeConversation !== null) {
+        const updatedConversations = [...conversations];
+        console.log("Updated Conversations: ", updatedConversations);
+        console.log("New Message: ", newMessage);
+        updatedConversations[activeConversation].chats?.push(newMessage);
+        setConversations(updatedConversations);
+        updatedConversations[activeConversation].chats?.push(chatData);
+        setConversations(updatedConversations);
+      }
+      // Update chatMessages state with the new chat data
+      //setChatMessages((prev) => [...prev, ...chatData.conversation.chats]);
+      
       toast.success("Response Generated", { id: "generatingres" });
     } catch (error) {
       console.log(error);
       toast.error("Generating Response failed", { id: "generatingres" });
     }
-    
     //setChatMessages([...chatData.chats]);
     //
   };
-  const handleSwitchChat = async () => {
+  const handleSwitchConversation = async (index: number) => {
     try {
       toast.loading("Switching Chat", { id: "switchchats" });
-      await createUserChats();
-      setChatMessages([]);
-      toast.success("Switching Chat Successfully", { id: "switchchats" });
+      await setActiveConversation(index);
+      await setChatMessages(conversations[activeConversation].chats);
+      console.log("Index: ", index, "Active Conversation: ", activeConversation, "Messages: ", chatMessages);
+      console.log("Conversations: ", conversations);
+      toast.success("Switched Chat Successfully", { id: "switchchats" });
     } catch (error) {
       console.log(error);
       toast.error("Switching chats failed", { id: "switchchats" });
     }
   };
-  const handleCreateConv = async () => {
+  const handleCreateConv = async (participants: String[]) => {
     try {
       toast.loading("Creating Chat", { id: "createchats" });
-      await createUserConv();
-      setChatMessages([]);
+      await createUserConv(conversations.length+1 , participants); // conversations.length should be amount of conversations + 1
+      // Check if there are conversations
+      if (conversations.length > 0) {
+        // Get the index of the last conversation
+        const lastIndex = conversations.length - 1;
+        // Set the activeConversation state to the index of the last conversation
+        setActiveConversation(lastIndex);
+        
+        // Get the last conversation
+        const lastConversation = conversations[lastIndex];
+        // Set chatMessages to the messages of the last conversation
+        setChatMessages(lastConversation.chats);
+      } else {
+        // If there are no conversations, set chatMessages to an empty array
+        setChatMessages([]);
+      }
       toast.success("Created Chat Successfully", { id: "createchats" });
     } catch (error) {
       console.log(error);
       toast.error("Creating chats failed", { id: "createchats" });
     }
   };
-  const handleDeleteChats = async () => {
+  const handleDeleteChats = async (index: number) => {
     try {
       toast.loading("Deleting Chats", { id: "deletechats" });
-      await deleteUserChats();
+      index += 1;
+      console.log("Index: ", index)
+      await deleteUserChats(index ?? 0);
       setChatMessages([]);
       toast.success("Deleted Chats Successfully", { id: "deletechats" });
     } catch (error) {
@@ -77,9 +116,12 @@ const Chat = () => {
   useLayoutEffect(() => {
     if (auth?.isLoggedIn && auth.user) {
       toast.loading("Loading Chats", { id: "loadchats" });
-      getUserChats()
+      getUserConversations()
         .then((data) => {
-          setChatMessages([...data.chats]);
+          console.log("Data: ", data);
+          var dMessages = data.conversations[activeConversation ?? 0]?.chats;
+          setConversations(data.conversations);
+          setChatMessages([...dMessages]);
           toast.success("Successfully loaded chats", { id: "loadchats" });
         })
         .catch((err) => {
@@ -138,7 +180,7 @@ const Chat = () => {
             Welcome to ADA
           </Typography>
           <Button
-            onClick={handleCreateConv}
+            onClick={() => handleCreateConv([auth?.user?.name?.toString() || ''])}
             sx={{
               width: "200px",
               color: "white",
@@ -146,29 +188,33 @@ const Chat = () => {
               borderRadius: 2,
               mx: "auto",
               marginTop: 5, 
-              marginBottom:5,
+              marginBottom: 5,
               bgcolor: "rgb(219,19,19)"
             }}
           >
             New Chat
           </Button>
+          {conversations.map((conversation, index) => (
+            <Button
+              key={conversation.id}
+              onClick={() => handleSwitchConversation(index)}
+              sx={{
+                width: "100%",
+                color: "white",
+                fontWeight: "700",
+                borderRadius: 2,
+                mx: "auto",
+                marginTop: "auto",
+                marginBottom: "auto",
+                bgcolor: "rgb(51, 51, 51)",
+              }}
+            >
+              {conversation.id}
+            </Button>
+          ))};
           <Button
-            onClick={handleSwitchChat}
-            sx={{
-              width: "100%",
-              color: "white",
-              fontWeight: "700",
-              borderRadius: 2,
-              mx: "auto",
-              marginTop: 5, 
-              marginBottom:5,
-              bgcolor: "rgb(51, 51, 51)"
-            }}
-          >
-            {auth?.user?.name.concat(", ADA")}
-          </Button>
-          <Button
-            onClick={handleDeleteChats}
+            onClick={() => handleDeleteChats(activeConversation ?? 0)}
+            component="button"
             sx={{
               width: "200px",
               color: "white",
@@ -176,7 +222,7 @@ const Chat = () => {
               borderRadius: 2,
               mx: "auto",
               marginTop: 'auto', 
-              marginBottom:5,
+              marginBottom: 5,
               bgcolor: "rgb(219,19,19)"
             }}
           >
@@ -218,10 +264,23 @@ const Chat = () => {
             scrollBehavior: "smooth",
           }}
         >
-          {chatMessages.map((chat, index) => (
-            //@ts-ignore
-            <ChatItem content={chat.content} role={chat.role} key={index} />
-          ))}
+          {chatMessages ? (
+            chatMessages.map((chat, index) => (
+              <ChatItem content={chat.content} role={chat.role} key={index} />
+            ))
+          ) : (
+            <Typography
+              sx={{
+                textAlign: "center",
+                color: "gray",
+                mt: "auto",
+                mb: "auto",
+                fontStyle: "italic",
+              }}
+            >
+              Ask anything about game development
+            </Typography>
+          )}
         </Box>
         <div
           style={{

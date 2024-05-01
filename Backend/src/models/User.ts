@@ -25,6 +25,11 @@ const chatSchema = new mongoose.Schema({
 
 // Define the conversation schema
 const conversationSchema = new mongoose.Schema({
+  id: {
+    type: Number,
+    required: true,
+    unique: true
+  },
   participants: [{ 
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'User' }],
@@ -36,7 +41,6 @@ interface IUser extends Document {
   name: string;
   email: string;
   password: string;
-  chats: IChat[];
   conversations: mongoose.Types.Array<typeof conversationSchema>;
   friends: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }];
 }
@@ -55,8 +59,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  chats: [chatSchema],
-  conversations: [{ type: conversationSchema, default: [] }],
+  conversations: [conversationSchema],
   friends: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
 });
 

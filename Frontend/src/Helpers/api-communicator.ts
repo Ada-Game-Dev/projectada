@@ -30,8 +30,8 @@ export const checkAuthStatus = async () => {
   return data;
 };
 
-export const sendChatRequest = async (message: string) => {
-  const res = await axios.post("/chat/new", { message });
+export const sendChatRequest = async (activeConversationId: number, message: string) => {
+  const res = await axios.post("/chat/new", { activeConversationId, message });
   if (res.status !== 200) {
     throw new Error("Unable to send chat");
   }
@@ -48,8 +48,17 @@ export const getUserChats = async () => {
   return data;
 };
 
-export const createUserConv = async () => {
-  const res = await axios.post("/chat/new-conversation ");
+export const getUserConversations = async () => {
+  const res = await axios.get("/chat/all-conversations");
+  if (res.status !== 200) {
+    throw new Error("Unable to send convo");
+  }
+  const data = await res.data;
+  return data;
+};
+
+export const createUserConv = async (id: number, participants: String[]) => {
+  const res = await axios.post("/chat/new-conversation", {id, participants});
   if (res.status !== 200) {
     throw new Error("Unable to create chats");
   }
@@ -57,8 +66,9 @@ export const createUserConv = async () => {
   return data;
 };
 
-export const deleteUserChats = async () => {
-  const res = await axios.delete("/chat/delete");
+export const deleteUserChats = async (activeConversationId: number) => {
+  console.log("activeConversationId", activeConversationId);
+  const res = await axios.post(`/chat/delete`, { activeConversationId });
   if (res.status !== 200) {
     throw new Error("Unable to delete chats");
   }
